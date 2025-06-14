@@ -1,27 +1,38 @@
 import { View, Text, Button, ActivityIndicator } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { signOut } from "../services/authService";
+import useSession from "../hooks/useSession";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { AppStackParamList } from "../navigation/AppNavigator";
+import type { AppStackParamList } from "../navigation/AppNavigator";
+import { useLayoutEffect } from "react";
 
-type Navigation = NativeStackNavigationProp<AppStackParamList, "Home">;
+type HomeScreenNavigationProp = NativeStackNavigationProp<
+  AppStackParamList,
+  "Home"
+>;
 
 export default function HomeScreen() {
-  const [loading, setLoading] = useState(true);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const { session, loading } = useSession();
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setUserEmail(data.session?.user?.email ?? null);
-      setLoading(false);
+  const navigation = useNavigation<HomeScreenNavigationProp>();
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <View style={{ marginRight: 8 }}>
+          <Button
+            title="Logout"
+            onPress={async () => {
+              await signOut();
+            }}
+          />
+        </View>
+      ),
     });
-  }, []);
+  }, [navigation]);
 
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading...</Text>
         <ActivityIndicator />
       </View>
     );
@@ -29,14 +40,7 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Bienvenue {userEmail} 🎉</Text>
-      <Button
-        title="Logout"
-        onPress={async () => {
-          await supabase.auth.signOut();
-          setUserEmail(null);
-        }}
-      />
+      <Button title="Notify all" />
     </View>
   );
 }

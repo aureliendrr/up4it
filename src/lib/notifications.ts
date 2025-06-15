@@ -26,7 +26,7 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
     token = (await Notifications.getExpoPushTokenAsync()).data;
     console.log('Expo Push Token:', token);
   } else {
-    alert('Doit être utilisé sur un vrai appareil');
+    alert('Vous devez utiliser un appareil physique pour recevoir des notifications push.');
   }
 
   if (Platform.OS === 'android') {

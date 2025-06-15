@@ -3,6 +3,10 @@ import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 
 export async function registerForPushNotificationsAsync(): Promise<string | null> {
+   if (Platform.OS === 'web') {
+    return null;
+  }
+  
   let token;
 
   if (Device.isDevice) {
